@@ -30,15 +30,15 @@ def fetch_linkedin_job_listings(start=0):
     # Loop through each <li>
     for li in soup.find_all("li"):
 
-        # 1. Extract job title
+        # Extract job title
         title_tag = li.find("h3", class_="base-search-card__title")
         title = title_tag.get_text(strip=True) if title_tag else None
 
-        # 2. Extract job URL
+        # Extract job URL
         link_tag = li.find("a", class_="base-card__full-link")
         url = link_tag["href"] if link_tag and link_tag.has_attr("href") else None
 
-        # 3. Extract location
+        # Extract location
         loc_tag = li.find("span", class_="job-search-card__location")
         location = loc_tag.get_text(strip=True) if loc_tag else None
 
