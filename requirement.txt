@@ -1,0 +1,8 @@
+requests
+re
+json
+spacy
+bs4
+urllib
+huggingface_hub
+collections
