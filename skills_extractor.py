@@ -104,15 +104,9 @@ def fetch_linkedin_job_descriptions(jobs):
         # Add the description to the job dictionary
         job["description"] = job_description
 
-        # write to html.txt
-        #with open("html.txt", "w", encoding="utf-8") as f:
-        #    f.write(f"Fetched job description for job ID {job_id} with status code {response.status_code}")
-        #    f.write(response.text)
-        #soup = BeautifulSoup(response.text, "html.parser")
-
     return jobs
 
-def extract_skills_from_description(jobs, nlp):    
+def extract_skills_from_description(jobs, nlp):
 
     for job in jobs:
 
