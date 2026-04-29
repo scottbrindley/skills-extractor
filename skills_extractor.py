@@ -1,7 +1,7 @@
-import requests, re, json, spacy
+import requests, re, json, spacy, os
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from huggingface_hub import snapshot_download
+from huggingface_hub import snapshot_download, login
 from collections import Counter
 
 
@@ -155,6 +155,9 @@ def calculate_skill_frequencies(jobs_dict):
 
 def extract_skills():
     
+    # Connect to Hugging Face Hub and download the NLP model
+    login(token=os.getenv("HF_TOKEN"))
+
     # Download NLP model from the Hub
     model_path = snapshot_download("amjad-awad/skill-extractor", repo_type="model")
 
