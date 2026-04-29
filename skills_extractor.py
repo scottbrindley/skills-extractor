@@ -89,7 +89,6 @@ def fetch_linkedin_job_descriptions(jobs):
             
             response = requests.get(url)  
             print(f"Fetched job description for job ID {job_id} with status code {response.status_code}")
-
             soup = BeautifulSoup(response.text, "html.parser")
 
             # Find the div containing the job description
