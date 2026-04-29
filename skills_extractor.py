@@ -56,16 +56,16 @@ def fetch_linkedin_job_listings(start=0):
 def extract_job_id_from_url(url):
     
     try:
-        # Step 1: Parse URL
+        # Parse URL
         parsed = urlparse(url)
 
-        # Step 2: Extract the last part of the path
+        # Extract the last part of the path
         last_segment = parsed.path.rsplit('/', 1)[-1]
 
-        # Step 3: Remove anything after '?'
+        # Remove anything after '?'
         job_id_str = last_segment.split('?', 1)[0]
 
-        # Step 4: Extract the number at the end
+        # Extract the number at the end
         match = re.search(r"(\d+)$", job_id_str)
         job_id = match.group(1) if match else None
 
