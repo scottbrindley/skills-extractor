@@ -152,7 +152,6 @@ def calculate_skill_frequencies(jobs_dict):
     return {'skill_counts': top_skills}
 
 
-### MAIN ###
 
 def extract_skills():
     
