@@ -2,3 +2,5 @@ requests
 spacy
 bs4
 huggingface_hub
+fastapi
+uvicorn
