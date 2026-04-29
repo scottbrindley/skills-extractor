@@ -1,4 +1,8 @@
-import requests, re, json, spacy, os
+import requests
+import re
+#import json
+import spacy
+import os
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from huggingface_hub import snapshot_download, login
@@ -18,11 +22,9 @@ def fetch_linkedin_job_listings(start=0):
 
     
     response = requests.get(url, params=payload)
-
     #print(response.text)
     # with open("html.txt", "r", encoding="utf-8") as f:
     #     html = f.read()
-
     soup = BeautifulSoup(response.text, "html.parser")
 
     results = []
@@ -42,7 +44,7 @@ def fetch_linkedin_job_listings(start=0):
         loc_tag = li.find("span", class_="job-search-card__location")
         location = loc_tag.get_text(strip=True) if loc_tag else None
 
-        # Filter results to only include jobs with "Data", "BI", or "Modeler" in the title (case insensitive)``
+        # Filter results to only include jobs with "Data", "BI", or "Modeler" in the title (case insensitive)
         if title and any(keyword in title.lower() for keyword in ("data", "bi", "modeler")):
             results.append({
                 "title": title,
@@ -108,12 +110,13 @@ def fetch_linkedin_job_descriptions(jobs):
 
 def extract_skills_from_description(jobs, nlp):
 
+    # Extract skill entities for each job description
     for job in jobs:
 
         text = job["description"]
-        doc = nlp(text)
-
-        # Extract skill entities        
+        if text is not None:
+            doc = nlp(text)
+        
         skills = {}
         for ent in doc.ents:
             if ent.text not in skills.get(ent.label_, []):
@@ -179,6 +182,5 @@ def extract_skills():
 
 if __name__ == "__main__":
     extract_skills()
-
 
 
