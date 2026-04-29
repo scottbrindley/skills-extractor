@@ -5,7 +5,6 @@ from huggingface_hub import snapshot_download, login
 from collections import Counter
 
 
-
 def fetch_linkedin_job_listings(start=0):
 
     print(f"Fetching jobs starting from index {start}...")
