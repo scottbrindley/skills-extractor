@@ -1,6 +1,7 @@
 import requests
 import re
-#import json
+
+# import json
 import spacy
 import os
 from bs4 import BeautifulSoup
@@ -13,16 +14,15 @@ def fetch_linkedin_job_listings(start=0):
 
     print(f"Fetching jobs starting from index {start}...")
 
-    url = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search'
+    url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
     payload = {
-        'keywords': 'data engineer bi',
-        'location': 'Australia',
-        'start': str(start)
+        "keywords": "data engineer bi",
+        "location": "Australia",
+        "start": str(start),
     }
 
-    
     response = requests.get(url, params=payload)
-    #print(response.text)
+    # print(response.text)
     # with open("html.txt", "r", encoding="utf-8") as f:
     #     html = f.read()
     soup = BeautifulSoup(response.text, "html.parser")
@@ -46,26 +46,22 @@ def fetch_linkedin_job_listings(start=0):
 
         # Filter results to only include jobs with "Data", "BI", or "Modeler" in the title (case insensitive)
         if title and any(keyword in title.lower() for keyword in ("data", "bi", "modeler")):
-            results.append({
-                "title": title,
-                "url": url,
-                "location": location
-            })
+            results.append({"title": title, "url": url, "location": location})
 
     return results
 
 
 def extract_job_id_from_url(url):
-    
+
     try:
         # Parse URL
         parsed = urlparse(url)
 
         # Extract the last part of the path
-        last_segment = parsed.path.rsplit('/', 1)[-1]
+        last_segment = parsed.path.rsplit("/", 1)[-1]
 
         # Remove anything after '?'
-        job_id_str = last_segment.split('?', 1)[0]
+        job_id_str = last_segment.split("?", 1)[0]
 
         # Extract the number at the end
         match = re.search(r"(\d+)$", job_id_str)
@@ -88,25 +84,30 @@ def fetch_linkedin_job_descriptions(jobs):
         if job_id is not None:
 
             url = f" https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{job_id}"
-            
-            response = requests.get(url)  
+
+            response = requests.get(url)
             print(f"Fetched job description for job ID {job_id} with status code {response.status_code}")
             soup = BeautifulSoup(response.text, "html.parser")
 
             # Find the div containing the job description
-            desc_div = soup.find("div", class_="description__text description__text--rich")
+            desc_div = soup.find(
+                "div", class_="description__text description__text--rich"
+            )
 
             # Extract text (preserves line breaks)
-            job_description = desc_div.get_text(separator="\n", strip=True) if desc_div else None
+            job_description = (
+                desc_div.get_text(separator="\n", strip=True) if desc_div else None
+            )
 
         else:
             print(f"Could not extract job ID from URL: {job['url']}")
             job_description = ""
-        
+
         # Add the description to the job dictionary
         job["description"] = job_description
 
     return jobs
+
 
 def extract_skills_from_description(jobs, nlp):
 
@@ -116,14 +117,14 @@ def extract_skills_from_description(jobs, nlp):
         text = job["description"]
         if text is not None:
             doc = nlp(text)
-        
+
         skills = {}
         for ent in doc.ents:
             if ent.text not in skills.get(ent.label_, []):
                 skills.setdefault(ent.label_, []).append(ent.text)
 
         job["skills"] = skills
-        
+
     return jobs
 
 
@@ -144,12 +145,11 @@ def calculate_skill_frequencies(jobs_dict):
     for skill, count in top_skills.items():
         print(f"{skill}: {count}")
 
-    return {'skill_counts': top_skills}
-
+    return {"skill_counts": top_skills}
 
 
 def extract_skills():
-    
+
     # Connect to Hugging Face Hub and download the NLP model
     login(token=os.getenv("HF_TOKEN"))
 
@@ -162,9 +162,9 @@ def extract_skills():
     jobs_dict = []
     # Assume there are no more than 500 job listings
     # We want to fetch in batches of 10, as that's what the LinkedIn API seems to return
-    limit=10
+    limit = 10
     for page in range(0, limit, 10):
-        
+
         # Fetch job listings and the job description for each listing
         results = fetch_linkedin_job_listings(page)
         results = fetch_linkedin_job_descriptions(results)
@@ -182,5 +182,3 @@ def extract_skills():
 
 if __name__ == "__main__":
     extract_skills()
-
-
