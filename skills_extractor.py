@@ -233,9 +233,11 @@ def extract_skills():
     login(token=os.getenv("HF_TOKEN"))
 
     # Download NLP model from the Hub
+    print(f"Downloading NLP model...")
     model_path = snapshot_download("amjad-awad/skill-extractor", repo_type="model")
 
     # Load the model with spaCy
+    print(f"Loading NLP model...")
     nlp = spacy.load(model_path)
 
     jobs_dict = []
