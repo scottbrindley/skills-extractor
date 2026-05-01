@@ -20,10 +20,10 @@ def fetch_linkedin_job_listings(start=0):
     Returns
     -------
     dict
-        A dictionary of job listings containing
+        A dictionary of job listings containing:
            - title: str
            - url: str
-           - location': str
+           - location: str
 
     Notes
     -----
@@ -63,18 +63,28 @@ def fetch_linkedin_job_listings(start=0):
     return results
 
 
-def extract_job_id_from_url(url):
+def extract_job_id_from_linkedin_url(url):
+    """
+    Extracts job ID from LinkedIn job page URL
+
+    Parameters
+    ----------
+    url : str
+        The LinkedIn job page URL
+
+    Returns
+    -------
+    str or None
+        The extracted job ID or None if extraction fails
+    """
 
     try:
-        # Parse URL
-        parsed = urlparse(url)
 
+        parsed = urlparse(url)
         # Extract the last part of the path
         last_segment = parsed.path.rsplit("/", 1)[-1]
-
         # Remove anything after '?'
         job_id_str = last_segment.split("?", 1)[0]
-
         # Extract the number at the end
         match = re.search(r"(\d+)$", job_id_str)
         job_id = match.group(1) if match else None
@@ -83,15 +93,35 @@ def extract_job_id_from_url(url):
 
     except TypeError:
         print(f"Invalid URL: {url}")
+        
         return None
 
 
 def fetch_linkedin_job_descriptions(jobs):
+    """
+    Fetch job descriptions for each job listing using LinkedIn HTML Response
 
-    # Fetch job descriptions for each job listing and add to the dictionary
+    Parameters
+    ----------
+    jobs : list
+        A list of job listings, where each listing is a dictionary containing:
+           - title: str
+           - url: str
+           - location: str
+
+    Returns
+    -------
+    list
+        A list of job listings, where each listing is a dictionary containing:
+           - title: str
+           - url: str
+           - location: str
+           - description: str
+    """
+
     for job in jobs:
 
-        job_id = extract_job_id_from_url(job["url"])
+        job_id = extract_job_id_from_linkedin_url(job["url"])
 
         if job_id is not None:
 
@@ -122,8 +152,31 @@ def fetch_linkedin_job_descriptions(jobs):
 
 
 def extract_skills_from_description(jobs, nlp):
+    """
+    Extract skills (named entities) from job description using a Hugging Face
+    NLP NER model fine-tuned for skill extraction
 
-    # Extract skill entities for each job description
+    Parameters
+    ----------
+    jobs : list
+        A list of job listings, where each listing is a dictionary containing:
+           - title: str
+           - url: str
+           - location: str
+           - description: str
+    Returns
+    -------
+    list
+        A list of job listings, where each listing is a dictionary containing:
+           - title: str
+           - url: str
+           - location: str
+           - description: str
+           - skills: dict[str, list[str]]
+                A dictionary of extracted skills, where the key is the entity label (e.g. "SKILLS") 
+                and the value is a list of unique skill names extracted from the description
+    """
+
     for job in jobs:
 
         text = job["description"]
@@ -141,8 +194,25 @@ def extract_skills_from_description(jobs, nlp):
 
 
 def calculate_skill_frequencies(jobs_dict):
+    """
+    Derive the top N most in-demand skills
 
-    # Derive the top N most in-demand skills
+    Parameters
+    ----------
+    jobs : list
+        A list of job listings, where each listing is a dictionary containing:
+           - title: str
+           - url: str
+           - location: str
+           - description: str
+           - skills: dict[str, list[str]]
+
+    Returns
+    -------
+    dict
+        - skill_counts: dict[str, int]
+    """
+    
     all_skills = []
 
     for job in jobs_dict:
@@ -153,9 +223,6 @@ def calculate_skill_frequencies(jobs_dict):
 
     top_n = 20
     top_skills = dict(skill_counts.most_common(top_n))
-
-    for skill, count in top_skills.items():
-        print(f"{skill}: {count}")
 
     return {"skill_counts": top_skills}
 
@@ -189,8 +256,6 @@ def extract_skills():
     skill_counts = calculate_skill_frequencies(jobs_dict)
     print(skill_counts)
     return skill_counts
-    # with open("jobs.json", "w", encoding="utf-8") as f:
-    #     json.dump(jobs_dict, f, indent=2, ensure_ascii=False)
 
 
 if __name__ == "__main__":
