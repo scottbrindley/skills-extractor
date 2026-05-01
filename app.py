@@ -10,5 +10,5 @@ def run():
     return {"status": "ok", "skill_counts": skill_counts}
 
 @app.get("/test")
-def run():
+def test():
     return {"status": "ok", "message": "API called successfully"}
