@@ -1,7 +1,5 @@
 import requests
 import re
-
-# import json
 import spacy
 import os
 from bs4 import BeautifulSoup
@@ -11,8 +9,26 @@ from collections import Counter
 
 
 def fetch_linkedin_job_listings(start=0):
+    """
+    Fetches batches of job listings from LinledIn, starting from a given API index (start)
 
-    print(f"Fetching jobs starting from index {start}...")
+    Parameters
+    ----------
+    start : int
+        Specifies starting index for fetching from API
+
+    Returns
+    -------
+    dict
+        A dictionary of job listings containing
+           - title: str
+           - url: str
+           - location': str
+
+    Notes
+    -----
+    - Any job listing without one of the following terms in the title is discarded: "Data", "BI", "Modeler"
+    """
 
     url = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
     payload = {
@@ -22,11 +38,7 @@ def fetch_linkedin_job_listings(start=0):
     }
 
     response = requests.get(url, params=payload)
-    # print(response.text)
-    # with open("html.txt", "r", encoding="utf-8") as f:
-    #     html = f.read()
     soup = BeautifulSoup(response.text, "html.parser")
-
     results = []
 
     # Loop through each <li>
@@ -166,6 +178,7 @@ def extract_skills():
     for page in range(0, limit, 10):
 
         # Fetch job listings and the job description for each listing
+        print(f"Fetching jobs starting from index {page}...")
         results = fetch_linkedin_job_listings(page)
         results = fetch_linkedin_job_descriptions(results)
         results = extract_skills_from_description(results, nlp)
