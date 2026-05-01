@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from huggingface_hub import snapshot_download, login
 from collections import Counter
+from memory_profiler import profile
 
 
 def fetch_linkedin_job_listings(start=0):
@@ -226,18 +227,18 @@ def calculate_skill_frequencies(jobs_dict):
 
     return {"skill_counts": top_skills}
 
-
+@profile
 def extract_skills():
 
     # Connect to Hugging Face Hub and download the NLP model
     login(token=os.getenv("HF_TOKEN"))
 
     # Download NLP model from the Hub
-    print(f"Downloading NLP model...")
+    print(f"INFO: Downloading NLP model...")
     model_path = snapshot_download("amjad-awad/skill-extractor", repo_type="model")
 
     # Load the model with spaCy
-    print(f"Loading NLP model...")
+    print(f"INFO: Loading NLP model...")
     nlp = spacy.load(model_path)
 
     jobs_dict = []
@@ -247,7 +248,7 @@ def extract_skills():
     for page in range(0, limit, 10):
 
         # Fetch job listings and the job description for each listing
-        print(f"Fetching jobs starting from index {page}...")
+        print(f"INFO: Fetching jobs starting from index {page}...")
         results = fetch_linkedin_job_listings(page)
         results = fetch_linkedin_job_descriptions(results)
         results = extract_skills_from_description(results, nlp)
