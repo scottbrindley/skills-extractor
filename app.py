@@ -8,3 +8,7 @@ app = FastAPI()
 def run():
     skill_counts = extract_skills()
     return {"status": "ok", "skill_counts": skill_counts}
+
+@app.get("/test")
+def run():
+    return {"status": "ok", "message": "API called successfully"}
